@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>知止 · 家庭能源大脑</title>
+<link rel="stylesheet" href="./static/styles.css">
+</head>
+<body>
+
+<div style="position:sticky;top:0;z-index:99;padding:9px 16px;font:13px/1.5 -apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+            background:rgba(251,191,36,.13);border-bottom:1px solid rgba(251,191,36,.34);color:#fcd34d;text-align:center">
+  <b>静态快照</b> · 数据全部来自真实运行的求解器输出，但页面已冻结 ——
+  「推进 / 注入事件」等会改变状态的操作需要真实后端。
+  本地复现：<code style="font-family:ui-monospace,Consolas,monospace">cd zhizhi &amp;&amp; .venv/Scripts/python -m zhizhi.cli serve</code>
+</div>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <h1>知止</h1>
+      <div>
+        <div class="sub">一台知道自己在替谁做决定的电池</div>
+        <div class="en">Zhizhi · Confidence-Gated Home Energy Brain</div>
+      </div>
+    </div>
+    <div class="topmeta">
+      <span><span class="dot" id="conn-dot"></span><span id="conn-text">连接中…</span></span>
+      <span id="clock">--:--:--</span>
+      <span id="device-name" class="muted">—</span>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="active" data-view="dash">仪表盘</button>
+    <button data-view="diag">不可满足诊断</button>
+    <button data-view="audit">审计凭据</button>
+    <button data-view="verify">验证与对照</button>
+    <button data-view="demo">演示控制台</button>
+    <button data-view="about">关于 / 边界</button>
+  </nav>
+
+  <section class="view active" id="view-dash">
+    <div class="grid hero">
+      <div class="hero-card">
+        <div class="hero-label">我现在敢替你决定多少</div>
+        <div class="level-row">
+          <div class="level-badge L3" id="level-badge">L3</div>
+          <div>
+            <div class="level-name" id="level-name">全托管</div>
+            <div class="level-sub" id="level-sub">置信度 —</div>
+          </div>
+        </div>
+        <div class="conf-meter">
+          <div class="conf-head">
+            <span class="lbl">整体置信度</span>
+            <span class="val" id="conf-overall">—</span>
+          </div>
+          <div class="conf-bar"><i id="conf-bar-fill" style="width:0%;background:var(--accent)"></i></div>
+          <div class="conf-parts">
+            <div class="conf-part"><div class="k">预测置信度</div><div class="v" id="conf-forecast">—</div>
+              <div class="bar"><i id="bar-forecast" style="width:0%"></i></div></div>
+            <div class="conf-part"><div class="k">数据置信度</div><div class="v" id="conf-data">—</div>
+              <div class="bar"><i id="bar-data" style="width:0%"></i></div></div>
+            <div class="conf-part"><div class="k">决策置信度</div><div class="v" id="conf-decision">—</div>
+              <div class="bar"><i id="bar-decision" style="width:0%"></i></div></div>
+          </div>
+        </div>
+        <div class="explain-box" id="explain-box">等待数据…</div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1fr;gap:16px">
+        <div class="card">
+          <h2>承诺边界（当前等级）</h2>
+          <div class="boundary">
+            <div class="promise"><h4>系统承诺</h4><ul id="boundary-promises"><li>—</li></ul></div>
+            <div class="refuse"><h4>明确不做</h4><ul id="boundary-refusals"><li>—</li></ul></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>设备与态势</h2>
+          <div class="grid c3" style="gap:12px">
+            <div class="metric"><span class="k">电池 SOC</span><span class="v" id="m-soc">—</span></div>
+            <div class="metric"><span class="k">光伏出力</span><span class="v" id="m-pv">—<span class="u">W</span></span></div>
+            <div class="metric"><span class="k">家庭负荷</span><span class="v" id="m-load">—<span class="u">W</span></span></div>
+          </div>
+          <div class="mt12">
+            <div class="kv"><span class="k">上次动作</span><span class="v" id="m-action">—</span></div>
+            <div class="kv"><span class="k">运行模式</span><span class="v" id="m-mode">—</span></div>
+            <div class="kv"><span class="k">数据口径</span><span class="v" id="m-scope">本地实测（非云端聚合）</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid c3 mt16">
+      <div class="card">
+        <h2>本轮计划成本（120 小时窗口）</h2>
+        <div class="metric">
+          <span class="v" id="m-cost">—<span class="u">元</span></span>
+          <span class="band" id="m-cost-band">区间 —</span>
+        </div>
+        <div class="mt12">
+          <div class="kv"><span class="k">规划模式</span><span class="v" id="m-mode-plan">—</span></div>
+          <div class="kv"><span class="k">求解器 / 耗时</span><span class="v" id="m-solver">—</span></div>
+          <div class="kv"><span class="k">峰段取电</span><span class="v" id="m-peak">—</span></div>
+          <div class="kv"><span class="k">吞吐量</span><span class="v" id="m-cycles">—</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>预测摘要（三源，全部带区间）</h2>
+        <div class="kv"><span class="k">光伏发电</span><span class="v" id="f-pv">—</span></div>
+        <div class="kv"><span class="k">家庭负荷</span><span class="v" id="f-load">—</span></div>
+        <div class="kv"><span class="k">平均电价</span><span class="v" id="f-price">—</span></div>
+        <div class="kv"><span class="k">价格不确定性</span><span class="v" id="f-priceunc">—</span></div>
+        <div class="kv"><span class="k">光伏不确定性</span><span class="v" id="f-pvunc">—</span></div>
+        <div class="mt8 muted">价格是三个预测源里最不可信的一个 —— 因此它通常是第一个降级信号。</div>
+      </div>
+      <div class="card">
+        <h2>运行计数</h2>
+        <div class="kv"><span class="k">快环 / 慢环</span><span class="v" id="c-loops">—</span></div>
+        <div class="kv"><span class="k">设备写入</span><span class="v" id="c-writes">—</span></div>
+        <div class="kv"><span class="k">护栏拒绝</span><span class="v" id="c-rejects">—</span></div>
+        <div class="kv"><span class="k">降级 / 升级</span><span class="v" id="c-levels">—</span></div>
+        <div class="kv"><span class="k">紧急提权</span><span class="v" id="c-emergency">—</span></div>
+      </div>
+    </div>
+
+    <div class="card mt16">
+      <h2>电价预测 · 区间带状图（元/度）</h2>
+      <div class="chart-wrap" id="chart-price"></div>
+    </div>
+
+    <div class="grid c2 mt16">
+      <div class="card"><h2>光伏发电预测（W）</h2><div class="chart-wrap" id="chart-pv"></div></div>
+      <div class="card"><h2>家庭负荷预测（W）</h2><div class="chart-wrap" id="chart-load"></div></div>
+    </div>
+
+    <div class="card mt16">
+      <h2>调度计划与 SOC 轨迹</h2>
+      <div class="chart-wrap" id="chart-plan"></div>
+    </div>
+
+    <div class="card mt16">
+      <h2>为什么这么做（逐时段依据）</h2>
+      <div class="alerts" id="reason-list" style="max-height:220px"></div>
+    </div>
+
+    <div class="card mt16">
+      <h2>事件与告警</h2>
+      <div class="alerts" id="alert-list"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-diag">
+    <div class="card">
+      <h2>不可满足诊断 —— 把「做不到」变成「这样做就行」</h2>
+      <p class="muted">输入一个目标。若做不到，系统会给出<b>最小冲突集</b>与<b>可执行的替代方案</b>，而不是默默给你一个次优结果。</p>
+      <div class="flex gap8 mt12">
+        <input type="text" id="diag-input" value="明天全天不用电网的电" placeholder="例如：明天全天不用电网的电">
+        <button class="btn primary" id="diag-run" style="white-space:nowrap">诊断</button>
+      </div>
+      <div class="btn-row mt12">
+        <button class="btn" data-diag="明天全天不用电网的电">全天不用电网</button>
+        <button class="btn" data-diag="明天电价不超过 0.20 元/度">电价不超过 0.20</button>
+        <button class="btn" data-diag="至少保留 60% 备电，且全天不用电网的电">备电 60% + 零电网</button>
+      </div>
+    </div>
+    <div id="diag-result" class="mt16"></div>
+  </section>
+
+  <section class="view" id="view-audit">
+    <div class="grid c3">
+      <div class="card">
+        <h2>哈希链校验</h2>
+        <div class="kv"><span class="k">等级变更链</span><span class="v" id="chain-level">—</span></div>
+        <div class="kv"><span class="k">决策记录链</span><span class="v" id="chain-record">—</span></div>
+        <div class="kv"><span class="k">凭据总数</span><span class="v" id="chain-total">—</span></div>
+        <div class="btn-row mt12">
+          <button class="btn primary" id="verify-btn">一键校验</button>
+          <button class="btn danger" id="tamper-btn">篡改检测演示</button>
+        </div>
+        <div class="mt12 muted">我们说的是 <b>tamper-evident（防篡改可检测）</b>，不是「不可篡改」 ——
+          房主有 root 权限，物理上可以改写本地文件；承诺的是「改写会留下可检测的痕迹」。</div>
+      </div>
+      <div class="card" style="grid-column: span 2">
+        <h2>等级变更凭据（append-only）</h2>
+        <div class="alerts" id="level-changes" style="max-height:420px"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-verify">
+    <div class="grid c2">
+      <div class="card">
+        <h2>校准度（目标覆盖率 80%）</h2>
+        <div class="btn-row"><button class="btn" id="calib-btn">跑校准度研究</button></div>
+        <div id="calib-result" class="mt12"></div>
+      </div>
+      <div class="card">
+        <h2>怎么读</h2>
+        <p class="muted">同时公布<b>覆盖率</b>、<b>锐度</b>与<b>区间分数（Winkler）</b>。
+          只看覆盖率可以靠「把区间拉宽」刷过，但拉宽区间会推高降级率、降低自主性 ——
+          <b>在本系统里刷分会自伤</b>。</p>
+        <p class="muted">校准器是<b>在线自适应</b>的（自适应保形推断）：漏盖就放大区间，盖太宽就收紧。</p>
+      </div>
+    </div>
+    <div class="card mt16">
+      <h2>S0 / S1 / S2 基线对照</h2>
+      <div class="btn-row"><button class="btn" id="baseline-btn">跑基线对照</button></div>
+      <div id="baseline-result" class="mt12"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-demo">
+    <div class="grid c3">
+      <div class="demo-act"><h4>幕一 · 套利者</h4><p>傍晚电价涨三倍。凌晨/午间充满，晚高峰放出来。</p>
+        <button class="btn primary" data-act="1">运行幕一</button></div>
+      <div class="demo-act"><h4>幕二 · 会攒钱的电池</h4><p>连阴三天。今天该放多少，还是留给后天？</p>
+        <button class="btn primary" data-act="2">运行幕二</button></div>
+      <div class="demo-act"><h4>幕三 · 守护者</h4><p>台风预警。秒级响应 + 备电续航（带区间）+ 主动降级。</p>
+        <button class="btn primary" data-act="3">运行幕三</button></div>
+    </div>
+
+    <div class="card mt16">
+      <h2>场景注入（实时影响正在运行的系统）</h2>
+      <div class="btn-row">
+        <button class="btn" data-event="price_spike">电价飙升</button>
+        <button class="btn" data-event="price_volatility">价格波动加剧</button>
+        <button class="btn" data-event="overcast_multi_day">连阴三天</button>
+        <button class="btn" data-event="typhoon_warning">台风预警</button>
+        <button class="btn" data-event="sensor_fault">传感器故障</button>
+        <button class="btn" data-event="grid_outage">模拟停电</button>
+        <button class="btn" data-event="grid_restored">并网恢复</button>
+        <button class="btn primary" data-event="recovery">场景恢复</button>
+      </div>
+      <div class="btn-row mt12">
+        <button class="btn" id="advance-15">推进 15 分钟</button>
+        <button class="btn" id="advance-60">推进 1 小时</button>
+      </div>
+      <div class="mt12"><div class="kv"><span class="k">当前场景</span><span class="v" id="demo-scenario">—</span></div></div>
+    </div>
+
+    <div class="card mt16">
+      <h2>自然语言目标（编译为约束）</h2>
+      <div class="flex gap8">
+        <input type="text" id="goal-input" value="尽量省钱，台风天要保住冰箱" placeholder="例如：明天全天不用电网的电">
+        <button class="btn primary" id="goal-btn" style="white-space:nowrap">编译</button>
+      </div>
+      <pre class="console mt12" id="goal-result">等待输入…</pre>
+    </div>
+
+    <div class="card mt16">
+      <h2>执行记录</h2>
+      <pre class="console" id="demo-console">选择上方任意一幕运行。</pre>
+    </div>
+  </section>
+
+  <section class="view" id="view-about">
+    <div class="grid c2">
+      <div class="card">
+        <h2>物理边界（主动写清）</h2>
+        <div class="kv"><span class="k">设备状态回读</span><span class="v">Modbus TCP 约 5 秒轮询</span></div>
+        <div class="kv"><span class="k">快环（决策+护栏+下发）</span><span class="v">毫秒级</span></div>
+        <div class="kv"><span class="k">慢环（MILP 重规划）</span><span class="v">约 1–2 秒，不在关键路径</span></div>
+        <div class="kv"><span class="k">端到端闭环</span><span class="v">约 5–10 秒（受轮询限制）</span></div>
+        <div class="kv"><span class="k">写入步长 / 死区 / 最小动作</span><span class="v">10W / 30W / 120W</span></div>
+        <div class="kv"><span class="k">最小写入间隔</span><span class="v">10 秒</span></div>
+        <div class="mt12 muted">我们说的是「<b>事件级秒响应</b>」，比传统 15 分钟周期调度快约两个数量级 ——
+          <b>不是</b>「毫秒级实时控制」。</div>
+      </div>
+      <div class="card"><h2>设备支持清单</h2><div id="device-support">加载中…</div></div>
+    </div>
+
+    <div class="card mt16">
+      <h2>Modbus 寄存器映射（真机路径的证据）</h2>
+      <div class="btn-row"><button class="btn" id="modbus-btn">查看 dry-run 报文</button></div>
+      <pre class="console mt12" id="modbus-result">点击上方按钮生成。</pre>
+    </div>
+
+    <div class="card mt16">
+      <h2>我们主动不声称的东西</h2>
+      <div class="muted" style="line-height:1.9">
+        ❌ 不是「我们提出 LLM 不应直接控制能源设备」 —— 2026 年已是领域共识（arXiv:2607.04569）<br>
+        ❌ 不是「我们提出给家庭能源做自主性分级」 —— SEPA/Powerley (2019) 与 Sigenergy EIL (2026-05) 已提出<br>
+        ❌ 不是「我们做 What-if 沙盒 / 回本测算」 —— Predbat 已完整落地<br>
+        ❌ 不是「编译器范式」 —— 该隐喻在数据中心、6G、嵌入式领域已有先例<br>
+        <br>
+        <b>我们的创新在于</b>：把「系统自评置信度」做成<b>运行时自主等级的判据</b>，
+        并配上<b>等级切换审计</b>与<b>责任矩阵</b>。这三条经检索确认在家庭能源领域无先例。
+      </div>
+    </div>
+  </section>
+
+</div>
+<script type="module" src="./static/static-shim.js"></script>
+<script type="module" src="./static/app.js"></script>
+</body>
+</html>

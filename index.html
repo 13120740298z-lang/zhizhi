@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>知止 · 一台知道自己在替谁做决定的电池</title>
+<meta name="description" content="Anker 首届黑客松挑战赛 · 赛道 2.2.3 充电储能 —— 知止：给家庭能源 AI 装上可验证的刹车与凭据。">
+<style>
+  :root{
+    --bg:#06080f; --panel:rgba(255,255,255,.032); --line:rgba(255,255,255,.09);
+    --ink:#e8ecf4; --ink2:#9aa7bd; --ink3:#64708a;
+    --safe:#34d399; --sky:#4cc2ff; --warn:#fbbf24;
+    --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.65;
+    -webkit-font-smoothing:antialiased;min-height:100vh;
+    display:flex;align-items:center;justify-content:center;padding:48px 24px;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;
+    background:
+      radial-gradient(820px 480px at 16% -6%,rgba(76,194,255,.11),transparent 62%),
+      radial-gradient(680px 440px at 88% 6%,rgba(52,211,153,.08),transparent 60%);
+  }
+  .wrap{position:relative;max-width:960px;width:100%}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:var(--sky);margin-bottom:14px}
+  h1{font-size:44px;font-weight:650;letter-spacing:-.02em;line-height:1.15;margin-bottom:16px}
+  .sub{font-size:17px;color:var(--ink2);max-width:660px;margin-bottom:8px}
+  .sub b{color:var(--ink);font-weight:600}
+  .meta{font-family:var(--mono);font-size:12px;color:var(--ink3);margin-top:20px}
+
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:38px}
+  a.card{
+    display:block;text-decoration:none;color:inherit;padding:26px;border-radius:15px;
+    background:var(--panel);border:1px solid var(--line);transition:.25s ease;
+  }
+  a.card:hover{border-color:rgba(76,194,255,.42);background:rgba(76,194,255,.055);transform:translateY(-3px)}
+  a.card.alt:hover{border-color:rgba(52,211,153,.42);background:rgba(52,211,153,.055)}
+  .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--ink3);margin-bottom:12px}
+  .card h2{font-size:21px;font-weight:650;margin-bottom:10px}
+  .card p{font-size:13.5px;color:var(--ink2);line-height:1.7}
+  .go{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-size:13px;font-weight:600;color:var(--sky)}
+  a.card.alt .go{color:var(--safe)}
+  .note{margin-top:16px;font-size:12px;color:var(--ink3);font-family:var(--mono)}
+
+  .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-top:30px}
+  .fact{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:15px}
+  .fact .k{font-size:11.5px;color:var(--ink3);margin-bottom:7px}
+  .fact .v{font-family:var(--mono);font-size:17px;font-weight:700}
+
+  footer{margin-top:38px;padding-top:22px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink3);line-height:1.9}
+  footer code{font-family:var(--mono);background:rgba(0,0,0,.35);padding:2px 7px;border-radius:5px;border:1px solid var(--line)}
+
+  @media(max-width:760px){
+    .cards,.facts{grid-template-columns:1fr}
+    h1{font-size:32px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">ANKER 首届黑客松挑战赛 · 赛道 2.2.3 充电储能</div>
+  <h1>知止</h1>
+  <p class="sub">
+    一台知道自己在替谁做决定的电池 ——
+    <b>它决定的不只是「做什么」，还包括「该不该由它来做」。</b>
+  </p>
+  <p class="sub">
+    家庭储能推广的真正瓶颈不是算法不够聪明，而是用户不敢把控制权交出去。
+    知止给家庭能源 AI 装上<b>可验证的刹车与凭据</b>：持续自评「我有多确定」，
+    用这个自评决定自己当前的权限等级，并在每一次降级时留下可校验的凭据。
+  </p>
+  <div class="meta">单文件 · 零依赖 · 断网可用 · 长期可访问</div>
+
+  <div class="cards">
+    <a class="card" href="./prototype/">
+      <div class="tag">DEMO · 推荐先看</div>
+      <h2>知止 · 原型</h2>
+      <p>
+        完整的叙事型演示：授权等级仪表盘、边缘控制器硬件、三幕演示（可交互切换）、
+        不可满足诊断、审计凭据、基线对照与校准度。
+        所有数字都来自真实运行的求解器输出。
+      </p>
+      <div class="go">打开原型 →</div>
+      <div class="note">单文件 922 KB · 无需任何环境</div>
+    </a>
+
+    <a class="card alt" href="./system/">
+      <div class="tag">SYSTEM · 完整系统界面</div>
+      <h2>知止 · 完整系统</h2>
+      <p>
+        原版 FastAPI 系统的完整前端：六个标签页（仪表盘 / 不可满足诊断 / 审计凭据 /
+        验证与对照 / 演示控制台 / 关于边界），含分位数带状图、SOC 轨迹与逐时段依据。
+      </p>
+      <div class="go">打开完整系统 →</div>
+      <div class="note">静态快照 · 数据为真实运行捕获</div>
+    </a>
+  </div>
+
+  <div class="facts">
+    <div class="fact"><div class="k">自动化测试</div><div class="v" style="color:var(--safe)">79 项全绿</div></div>
+    <div class="fact"><div class="k">三幕演示</div><div class="v" style="color:var(--safe)">3 / 3 通过</div></div>
+    <div class="fact"><div class="k">快环响应</div><div class="v">0.2 ms</div></div>
+    <div class="fact"><div class="k">校准覆盖率</div><div class="v">→ 0.80</div></div>
+  </div>
+
+  <footer>
+    <b style="color:var(--ink2)">关于「完整系统」这一页</b>：它是原版前端 + 一次真实运行的 API 快照。
+    数据不是示意数据，但页面已冻结 —— 「推进 / 注入事件」这类会改变状态的操作需要真实后端。<br>
+    本地复现：<code>cd zhizhi &amp;&amp; .venv/Scripts/python -m zhizhi.cli serve</code> →
+    <code>http://127.0.0.1:8000</code><br>
+    <span style="color:var(--ink3)">求解器 CVXPY + HiGHS · 设备接入 Anker SOLIX 本地 Modbus TCP · 治理层跑在用户自己的边缘控制器上</span>
+  </footer>
+
+</div>
+</body>
+</html>
