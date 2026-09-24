@@ -6,116 +6,248 @@
 <title>知止 · 一台知道自己在替谁做决定的电池</title>
 <meta name="description" content="Anker 首届黑客松挑战赛 · 赛道 2.2.3 充电储能 —— 知止：给家庭能源 AI 装上可验证的刹车与凭据。">
 <style>
+  /* =====================================================================
+     知止 · 落地页（纸墨编辑风）
+     依据：产品生态图谱《01-UI视觉设计 A 规格》+《风格库深挖 01-极简风》
+     主风格：极简（白纸墨字）≥70%；点缀：衬线中文标题（国风 ≤30%）
+     色相 ≤3：墨（中性）/ 墨绿（强调）/ 金褐（次强调，仅数据表）
+     ===================================================================== */
   :root{
-    --bg:#06080f; --panel:rgba(255,255,255,.032); --line:rgba(255,255,255,.09);
-    --ink:#e8ecf4; --ink2:#9aa7bd; --ink3:#64708a;
-    --safe:#34d399; --sky:#4cc2ff; --warn:#fbbf24;
-    --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
-    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    --bg:#F7F5F0;          /* 暖纸白 */
+    --paper:#FFFFFF;       /* 卡片白 */
+    --surface-2:#F1EDE4;   /* 浅纸灰 */
+    --line:#E3DFD4;        /* 淡墨线 */
+    --line-strong:#C9C3B4;
+    --ink:#1F1B16;         /* 浓墨 */
+    --ink-2:#5C564B;       /* 次墨 */
+    --ink-3:#767059;       /* 淡墨（辅助小字） */
+    --green:#2F7D5F;       /* 墨绿：唯一强调色 */
+    --green-dim:#EAF2EE;   /* 墨绿浅底 */
+    --brown:#8A4B36;       /* 金褐：次强调（仅用于代价/警示数字） */
+    --serif:"Noto Serif SC","Source Han Serif SC","STSong","SimSun",serif;
+    --sans:system-ui,-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    --mono:ui-monospace,"Cascadia Mono",Consolas,"Liberation Mono",monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
   body{
-    background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.65;
-    -webkit-font-smoothing:antialiased;min-height:100vh;
-    display:flex;align-items:center;justify-content:center;padding:48px 24px;
+    background:var(--bg);color:var(--ink);font-family:var(--sans);
+    font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;
   }
-  body::before{
-    content:"";position:fixed;inset:0;pointer-events:none;
-    background:
-      radial-gradient(820px 480px at 16% -6%,rgba(76,194,255,.11),transparent 62%),
-      radial-gradient(680px 440px at 88% 6%,rgba(52,211,153,.08),transparent 60%);
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+
+  /* ---- 顶栏 ---- */
+  header{border-bottom:1px solid var(--line);background:var(--bg)}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:20px;height:60px}
+  .brand{display:flex;align-items:baseline;gap:12px}
+  .brand h1{font-family:var(--serif);font-size:20px;font-weight:600;letter-spacing:.3em}
+  .brand .tag{font-size:12.5px;color:var(--ink-2)}
+  .bar nav{display:flex;gap:22px;font-size:13.5px}
+  .bar nav a{color:var(--ink-2);text-decoration:none}
+  .bar nav a:hover{color:var(--green)}
+
+  /* ---- 首屏：痛点 + 硬件 + 演示入口 ---- */
+  .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;padding:56px 0 52px;align-items:center}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--green);margin-bottom:16px}
+  .hero h2{font-family:var(--serif);font-size:34px;font-weight:600;line-height:1.35;margin-bottom:14px}
+  .hero h2 em{font-style:normal;color:var(--green)}
+  .pain{font-size:16.5px;color:var(--ink-2);max-width:560px;margin-bottom:10px}
+  .pain b{color:var(--ink);font-weight:600}
+  .cta{display:flex;gap:14px;margin-top:26px;flex-wrap:wrap}
+  .btn{display:inline-block;padding:11px 26px;border-radius:6px;font-size:15px;font-weight:600;text-decoration:none;border:1px solid transparent}
+  .btn.primary{background:var(--green);color:#fff}
+  .btn.primary:hover{background:#276A50}
+  .btn.ghost{background:var(--paper);color:var(--ink);border-color:var(--line-strong)}
+  .btn.ghost:hover{border-color:var(--ink-2)}
+  .fig{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:14px}
+  .fig img{display:block;width:100%;height:auto;border-radius:3px}
+  .fig figcaption{font-size:12.5px;color:var(--ink-3);margin-top:10px;line-height:1.6}
+  .fig figcaption b{color:var(--ink-2);font-weight:600}
+
+  /* ---- 区块通用 ---- */
+  section{padding:52px 0;border-top:1px solid var(--line)}
+  .sec-head{margin-bottom:28px}
+  .sec-head .kicker{margin-bottom:10px}
+  .sec-head h3{font-family:var(--serif);font-size:24px;font-weight:600;line-height:1.4}
+  .sec-head p{color:var(--ink-2);font-size:14.5px;margin-top:6px;max-width:720px}
+
+  /* ---- 三个机制 ---- */
+  .mech{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .mech .card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:24px}
+  .mech .no{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--green);margin-bottom:12px}
+  .mech h4{font-size:17px;font-weight:600;margin-bottom:10px;line-height:1.45}
+  .mech p{font-size:13.5px;color:var(--ink-2);line-height:1.75}
+  .mech p b{color:var(--ink);font-weight:600}
+
+  /* ---- 数据条 ---- */
+  .facts{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+  .fact{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:18px 16px}
+  .fact .k{font-size:12px;color:var(--ink-3);margin-bottom:8px}
+  .fact .v{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--ink)}
+  .fact .v.g{color:var(--green)}
+  .fact .s{font-size:11.5px;color:var(--ink-3);margin-top:6px}
+
+  /* ---- 诚实边界 ---- */
+  .ledger{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .ledger .card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:24px}
+  .ledger h4{font-size:15.5px;font-weight:600;margin-bottom:12px}
+  .ledger ul{list-style:none}
+  .ledger li{font-size:13.5px;color:var(--ink-2);line-height:1.8;padding-left:16px;position:relative}
+  .ledger li::before{content:"";position:absolute;left:0;top:.72em;width:6px;height:1px;background:var(--ink-3)}
+  .ledger li b{color:var(--ink);font-weight:600}
+  .ledger .cost td{font-size:13px;padding:5px 8px;border-bottom:1px solid var(--line);color:var(--ink-2)}
+  .ledger .cost td:first-child{color:var(--ink)}
+  .ledger .cost td:last-child,.ledger .cost td:nth-child(3){font-family:var(--mono);text-align:right}
+  .ledger .cost th{font-size:12px;color:var(--ink-3);text-align:left;padding:0 8px 6px;font-weight:400}
+  .ledger .cost th:nth-child(2),.ledger .cost th:nth-child(3){text-align:right}
+  pre.cmd{
+    margin-top:14px;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;
+    padding:14px 16px;font-family:var(--mono);font-size:12.5px;color:var(--ink-2);
+    overflow-x:auto;line-height:1.8;
   }
-  .wrap{position:relative;max-width:960px;width:100%}
-  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:var(--sky);margin-bottom:14px}
-  h1{font-size:44px;font-weight:650;letter-spacing:-.02em;line-height:1.15;margin-bottom:16px}
-  .sub{font-size:17px;color:var(--ink2);max-width:660px;margin-bottom:8px}
-  .sub b{color:var(--ink);font-weight:600}
-  .meta{font-family:var(--mono);font-size:12px;color:var(--ink3);margin-top:20px}
+  pre.cmd b{color:var(--green);font-weight:600}
 
-  .cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:38px}
-  a.card{
-    display:block;text-decoration:none;color:inherit;padding:26px;border-radius:15px;
-    background:var(--panel);border:1px solid var(--line);transition:.25s ease;
-  }
-  a.card:hover{border-color:rgba(76,194,255,.42);background:rgba(76,194,255,.055);transform:translateY(-3px)}
-  a.card.alt:hover{border-color:rgba(52,211,153,.42);background:rgba(52,211,153,.055)}
-  .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--ink3);margin-bottom:12px}
-  .card h2{font-size:21px;font-weight:650;margin-bottom:10px}
-  .card p{font-size:13.5px;color:var(--ink2);line-height:1.7}
-  .go{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-size:13px;font-weight:600;color:var(--sky)}
-  a.card.alt .go{color:var(--safe)}
-  .note{margin-top:16px;font-size:12px;color:var(--ink3);font-family:var(--mono)}
+  /* ---- 页脚 ---- */
+  footer{border-top:1px solid var(--line);padding:34px 0 46px;font-size:13px;color:var(--ink-3);line-height:1.9}
+  footer b{color:var(--ink-2);font-weight:600}
+  footer a{color:var(--green);text-decoration:none}
+  footer a:hover{text-decoration:underline}
 
-  .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-top:30px}
-  .fact{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:15px}
-  .fact .k{font-size:11.5px;color:var(--ink3);margin-bottom:7px}
-  .fact .v{font-family:var(--mono);font-size:17px;font-weight:700}
-
-  footer{margin-top:38px;padding-top:22px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink3);line-height:1.9}
-  footer code{font-family:var(--mono);background:rgba(0,0,0,.35);padding:2px 7px;border-radius:5px;border:1px solid var(--line)}
-
-  @media(max-width:760px){
-    .cards,.facts{grid-template-columns:1fr}
-    h1{font-size:32px}
+  @media(max-width:900px){
+    .hero{grid-template-columns:1fr;gap:30px;padding:40px 0}
+    .hero h2{font-size:27px}
+    .mech,.ledger{grid-template-columns:1fr}
+    .facts{grid-template-columns:repeat(2,1fr)}
+    .bar nav{display:none}
   }
 </style>
 </head>
 <body>
+
+<header>
+  <div class="wrap bar">
+    <div class="brand"><h1>知止</h1><span class="tag">一台知道自己在替谁做决定的电池</span></div>
+    <nav>
+      <a href="#mech">机制</a><a href="#facts">数据</a><a href="#edge">边界</a>
+      <a href="https://github.com/13120740298z-lang/zhizhi">源码</a>
+    </nav>
+  </div>
+</header>
+
 <div class="wrap">
 
-  <div class="eyebrow">ANKER 首届黑客松挑战赛 · 赛道 2.2.3 充电储能</div>
-  <h1>知止</h1>
-  <p class="sub">
-    一台知道自己在替谁做决定的电池 ——
-    <b>它决定的不只是「做什么」，还包括「该不该由它来做」。</b>
-  </p>
-  <p class="sub">
-    家庭储能推广的真正瓶颈不是算法不够聪明，而是用户不敢把控制权交出去。
-    知止给家庭能源 AI 装上<b>可验证的刹车与凭据</b>：持续自评「我有多确定」，
-    用这个自评决定自己当前的权限等级，并在每一次降级时留下可校验的凭据。
-  </p>
-  <div class="meta">单文件 · 零依赖 · 断网可用 · 长期可访问</div>
-
-  <div class="cards">
-    <a class="card" href="./prototype/">
-      <div class="tag">DEMO · 推荐先看</div>
-      <h2>知止 · 原型</h2>
-      <p>
-        完整的叙事型演示：授权等级仪表盘、边缘控制器硬件、三幕演示（可交互切换）、
-        不可满足诊断、审计凭据、基线对照与校准度。
-        所有数字都来自真实运行的求解器输出。
+  <!-- ① 痛点 ② 硬件 ③ 演示入口：评委首屏 -->
+  <div class="hero">
+    <div>
+      <div class="kicker">ANKER 首届黑客松挑战赛 · 赛道 2.2.3 充电储能</div>
+      <h2>先让 AI 决定，<em>它能决定多少</em></h2>
+      <p class="pain">
+        家里的电池会说「能撑 4 小时」「省 47 元」，但从不告诉你这两个数字有多不可靠。
+        台风天备电撑不住，损失是你的，不是算法的。
+        <b>用户不敢交出控制权，是理性的。</b>
       </p>
-      <div class="go">打开原型 →</div>
-      <div class="note">单文件 922 KB · 无需任何环境</div>
-    </a>
-
-    <a class="card alt" href="./system/">
-      <div class="tag">SYSTEM · 完整系统界面</div>
-      <h2>知止 · 完整系统</h2>
-      <p>
-        原版 FastAPI 系统的完整前端：六个标签页（仪表盘 / 不可满足诊断 / 审计凭据 /
-        验证与对照 / 演示控制台 / 关于边界），含分位数带状图、SOC 轨迹与逐时段依据。
+      <p class="pain">
+        知止持续自评「我有多确定」，用这个自评决定自己当前的权限等级，
+        并在每一次降级时留下可校验的凭据。
       </p>
-      <div class="go">打开完整系统 →</div>
-      <div class="note">静态快照 · 数据为真实运行捕获</div>
-    </a>
+      <div class="cta">
+        <a class="btn primary" href="./prototype/">打开在线演示 →</a>
+        <a class="btn ghost" href="./system/">完整系统界面</a>
+      </div>
+    </div>
+    <figure class="fig">
+      <img src="./assets/hardware.jpg" alt="知止边缘控制器硬件原型">
+      <figcaption><b>我们的硬件原型，已经在桌上。</b>
+        自研边缘控制器：带屏、板载光照与环境传感、本地直连储能设备。
+        治理层（护栏、快环、审计账本）就跑在它上面，不跑在厂商云上。</figcaption>
+    </figure>
   </div>
 
-  <div class="facts">
-    <div class="fact"><div class="k">自动化测试</div><div class="v" style="color:var(--safe)">79 项全绿</div></div>
-    <div class="fact"><div class="k">三幕演示</div><div class="v" style="color:var(--safe)">3 / 3 通过</div></div>
-    <div class="fact"><div class="k">快环响应</div><div class="v">0.2 ms</div></div>
-    <div class="fact"><div class="k">校准覆盖率</div><div class="v">→ 0.80</div></div>
-  </div>
+  <!-- ④ 三个机制 -->
+  <section id="mech">
+    <div class="sec-head">
+      <div class="kicker">机制</div>
+      <h3>三个功能点，共用一条底线：它从不说自己没把握的数字</h3>
+    </div>
+    <div class="mech">
+      <div class="card">
+        <div class="no">01</div>
+        <h4>置信度驱动的授权等级</h4>
+        <p>系统自评预测、数据、决策三类置信度，作为<b>唯一自动判据</b>决定 L0–L3 权限。
+           价格冲击实测：<b>置信度 65% → 43%，等级 L3 → L1</b>，降级原因全程可查。</p>
+      </div>
+      <div class="card">
+        <div class="no">02</div>
+        <h4>区间，不是点估计</h4>
+        <p>所有结论按 P10/P50/P90 输出：续航 <b>3.7 小时（P50），最差 2.3 小时（P10）</b>。
+           区间宽度同时是输出、输入与判据：越不准越宽，越宽越降级。</p>
+      </div>
+      <div class="card">
+        <div class="no">03</div>
+        <h4>做不到就说做不到</h4>
+        <p>「明天全天不用电网的电」做不到。系统给出<b>最小冲突集</b>与三条替代路径，
+           代价算到小数点后：<b>接受 5.14 kWh 最低价取电，约 0.88 元</b>。</p>
+      </div>
+    </div>
+  </section>
 
-  <footer>
-    <b style="color:var(--ink2)">关于「完整系统」这一页</b>：它是原版前端 + 一次真实运行的 API 快照。
-    数据不是示意数据，但页面已冻结 —— 「推进 / 注入事件」这类会改变状态的操作需要真实后端。<br>
-    本地复现：<code>cd zhizhi &amp;&amp; .venv/Scripts/python -m zhizhi.cli serve</code> →
-    <code>http://127.0.0.1:8000</code><br>
-    <span style="color:var(--ink3)">求解器 CVXPY + HiGHS · 设备接入 Anker SOLIX 本地 Modbus TCP · 治理层跑在用户自己的边缘控制器上</span>
-  </footer>
+  <!-- ⑤ 数据 -->
+  <section id="facts">
+    <div class="sec-head">
+      <div class="kicker">实测数据</div>
+      <h3>全部来自真实运行的求解器输出，非示意</h3>
+    </div>
+    <div class="facts">
+      <div class="fact"><div class="k">自动化测试</div><div class="v g">79 项</div><div class="s">覆盖率 84%</div></div>
+      <div class="fact"><div class="k">三幕演示</div><div class="v g">3 / 3</div><div class="s">可现场运行</div></div>
+      <div class="fact"><div class="k">快环响应</div><div class="v">0.2 ms</div><div class="s">决策+护栏+下发</div></div>
+      <div class="fact"><div class="k">台风备电违约</div><div class="v g">349 → 3 段</div><div class="s">对照纯优化器</div></div>
+      <div class="fact"><div class="k">区间校准覆盖</div><div class="v">0.80</div><div class="s">三源收敛至目标值</div></div>
+    </div>
+  </section>
+
+  <!-- ⑥ 边界 -->
+  <section id="edge">
+    <div class="sec-head">
+      <div class="kicker">诚实边界</div>
+      <h3>我们主动公布保费，也公布保费买到了什么</h3>
+    </div>
+    <div class="ledger">
+      <div class="card">
+        <h4>治理成本（对照纯优化器）</h4>
+        <table class="cost" style="width:100%;border-collapse:collapse">
+          <tr><th>场景</th><th>成本</th><th>买到了什么</th></tr>
+          <tr><td>正常天气</td><td>+1.33 元</td><td>悲观世界电费反而低 0.37 元</td></tr>
+          <tr><td>连阴三天</td><td>+0.97 元</td><td>峰段取电减少 0.87 kWh</td></tr>
+          <tr><td>台风预警</td><td style="color:var(--brown)">+4.86 元</td><td>备电违约下降 99%</td></tr>
+        </table>
+        <p style="font-size:12.5px;color:var(--ink-3);margin-top:12px">
+          保费随不确定性变化：预报可信时接近零，台风预警才花钱。代价（峰段多买 5.78 kWh）同样列在材料里。</p>
+      </div>
+      <div class="card">
+        <h4>我们主动不声称</h4>
+        <ul>
+          <li>「LLM 不直接控制能源设备」是 2026 年的<b>领域共识</b>，不是我们的创新。</li>
+          <li>家庭能源自主性分级已有先例（SEPA 2019、Sigenergy EIL 2026-05）。</li>
+          <li>What-if 沙盒已被 Predbat 完整落地，我们没有重做。</li>
+          <li>校准与对照基于<b>物理自洽的仿真序列</b>；真机与 HA 集成在决赛 24 小时内完成。</li>
+        </ul>
+        <pre class="cmd"><b>cd zhizhi</b> &amp;&amp; .venv/Scripts/python -m zhizhi.cli demo --act all
+.venv/Scripts/python -m zhizhi.cli audit verify   <span style="color:var(--ink-3)"># 审计哈希链校验</span></pre>
+      </div>
+    </div>
+  </section>
 
 </div>
+
+<footer>
+  <div class="wrap">
+    <b>知止 · Zhizhi</b> ｜ Anker 首届黑客松挑战赛 · 赛道 2.2.3 充电储能 · 预赛提交截止 2026-09-27<br>
+    在线<a href="./prototype/">原型演示</a> · <a href="./system/">完整系统</a> ·
+    <a href="https://github.com/13120740298z-lang/zhizhi">源码仓库</a><br>
+    求解器 CVXPY + HiGHS · 设备接入 Anker SOLIX 本地 Modbus TCP · 治理层跑在用户自己的边缘控制器上
+  </div>
+</footer>
+
 </body>
 </html>
